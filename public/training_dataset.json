@@ -1,0 +1,227 @@
+{
+  "dataset_name": "lost-and-found-campus-ai-agent-v1",
+  "version": "1.0.0",
+  "description": "Fine-tuning dataset for AI agents in campus lost and found item recovery, matching similarity, slot filling, and safe verification.",
+  "ontology": {
+    "categories": [
+      "Electronics",
+      "Campus IDs & Cards",
+      "Keys & Access",
+      "Bags & Backpacks",
+      "Water Bottles",
+      "Books & Study Supplies",
+      "Clothing & Accessories",
+      "Eyewear & Watches",
+      "Jewelry",
+      "Sports & Gym",
+      "Other"
+    ],
+    "locations": [
+      "Main Library",
+      "Student Union",
+      "Science Quad",
+      "Engineering Hall",
+      "Campus Rec & Gym",
+      "North Dining Commons",
+      "South Dining Hall",
+      "Arts & Humanities Center",
+      "Residence Halls (East)",
+      "Residence Halls (West)",
+      "Campus Shuttle & Bus Stop",
+      "University Bookstore",
+      "Campus Green / Quad",
+      "Other Campus Location"
+    ],
+    "matching_weights": {
+      "semantic_description_and_keywords": 0.40,
+      "category_congruence": 0.25,
+      "location_proximity": 0.20,
+      "date_proximity": 0.15
+    }
+  },
+  "training_examples_chatml": [
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent. You assist students in identifying lost or found items, analyzing text similarity, determining match confidence, and providing safe return protocols."
+        },
+        {
+          "role": "user",
+          "content": "I lost my AirPods Pro on the second floor of the campus library. They are in a sky blue silicone case with a silver clip. Did anyone turn them in?"
+        },
+        {
+          "role": "assistant",
+          "content": "I identified a high-confidence potential match (92% confidence) in our campus registry:\n\n- **Item**: AirPods Pro Earbuds in Light Blue Rubber Cover\n- **Location**: Main Library (found on 2nd floor, turned into 1st Floor Circulation & Security Desk)\n- **Date**: Sept 26, 2026\n- **Match Analysis**: Exact category match (Electronics), matching campus hub (Main Library), identical date, and matching descriptors ('AirPods Pro', 'blue', 'silicone/rubber', 'clip').\n\n**Next Steps**:\nVisit the Main Library 1st Floor Security & Desk. Bring your phone to show Bluetooth device pairing or proof of your Apple ID to verify ownership before claiming."
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."
+        },
+        {
+          "role": "user",
+          "content": "I found someone's student ID card near the North Dining Commons conveyor belt. Should I post their full ID number and photo online so they can find it?"
+        },
+        {
+          "role": "assistant",
+          "content": "No, for student privacy and identity protection, never post complete student ID numbers, barcodes, birthdates, or clear unredacted card photos online.\n\nRecommended Safe Action:\n1. Hand the card to the North Dining Hall manager's desk or the University Registrar / Card Services.\n2. Submit a 'Found Item' report listing only the student's name, the date found, and the official desk where they can safely present photo ID to retrieve it."
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."
+        },
+        {
+          "role": "user",
+          "content": "Compare these two items and explain if they match:\nItem A: 'Olive Green Hydro Flask 32oz with Yosemite and Rocky Mountain national park stickers' at Campus Rec & Gym on Sept 25.\nItem B: 'Green Metal Water Bottle with nature and park stickers' found at Campus Rec & Gym on Sept 25."
+        },
+        {
+          "role": "assistant",
+          "content": "### Match Evaluation: HIGH CONFIDENCE (89% Score)\n\n**Feature Breakdown**:\n- **Category**: 100% (Both categorized under Water Bottles)\n- **Location**: 100% (Both located at Campus Rec & Gym)\n- **Time**: 100% (Both reported on the exact same date: Sept 25, 2026)\n- **Content Similarity**: 82% (Strong lexical overlap: 'green', 'water bottle / flask', 'park stickers')\n\n**Explanation**:\nItem B is almost certainly a match for Item A. The green insulated bottle matches the specific gym location, timeline, and distinctive stickers. The owner should verify the specific park names (Yosemite & Rocky Mountain) with the gym front desk."
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."
+        },
+        {
+          "role": "user",
+          "content": "Extract the structured item report parameters from this text: 'Left my black Texas Instruments graphing calculator with a gold bee sticker in room 302 of Engineering Hall yesterday afternoon.'"
+        },
+        {
+          "role": "assistant",
+          "content": "```json\n{\n  \"type\": \"lost\",\n  \"title\": \"TI-84 Graphing Calculator with Gold Bee Sticker\",\n  \"category\": \"Electronics\",\n  \"location\": \"Engineering Hall\",\n  \"location_detail\": \"Room 302 Lecture Hall\",\n  \"description\": \"Black Texas Instruments graphing calculator with a gold bee sticker on the slide cover.\",\n  \"distinguishing_marks\": [\"gold bee sticker\", \"black casing\"]\n}\n```"
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."
+        },
+        {
+          "role": "user",
+          "content": "Compare these two items:\nItem 1: 'Apple AirPods Pro in sky blue case' lost at Main Library.\nItem 2: 'Car key fob on blue fabric lanyard' found at Campus Shuttle Stop."
+        },
+        {
+          "role": "assistant",
+          "content": "### Match Evaluation: LOW CONFIDENCE (22% Score)\n\n**Feature Breakdown**:\n- **Category**: 10% (Electronics vs Keys & Access)\n- **Location**: 20% (Main Library vs Campus Shuttle & Bus Stop)\n- **Content Overlap**: 15% (Only shares the generic color word 'blue')\n\n**Explanation**:\nThese items do not match. They belong to completely separate product categories and different campus locations. The color 'blue' is too common to imply a relation."
+        }
+      ]
+    }
+  ],
+  "training_examples_alpaca": [
+    {
+      "instruction": "Evaluate the likelihood that a lost item report corresponds to a found item report based on category, location, timeframe, and textual descriptors.",
+      "input": "Lost Item: 'Heather grey Patagonia roll-top backpack with navy straps, contains notebooks and keys, lost at Student Union food court on Sept 26.'\nFound Item: 'Grey canvas daypack with navy accents, stationery inside, turned in at Student Union info counter on Sept 27.'",
+      "output": "Match Likelihood: 84% (High Confidence).\n- Category Alignment: Both Bags & Backpacks.\n- Campus Location: Exact match at Student Union.\n- Time Window: 1 day gap (consistent with overnight janitorial discovery).\n- Text Overlap: Both note 'grey' color and 'navy' accents, plus stationery/notebooks inside."
+    },
+    {
+      "instruction": "Generate safe handover recommendations for returning a recovered high-value item on a college campus.",
+      "input": "Recovered item: Apple MacBook Air M2 laptop with campus stickers.",
+      "output": "Recommended Safe Handover Protocol:\n1. Neutral Public Location: Meet at an official, staffed desk (e.g. Student Union Welcome Center, Campus Police Substation, or Main Library Circulation).\n2. Verifiable Identification: Have the claimant unlock the device with their password, display device serial number in their Apple ID profile, or show photo student ID matching account login.\n3. Digital Receipt: Send a confirmation message through the campus relay system documenting the successful return."
+    }
+  ],
+  "preference_dpo_pairs": [
+    {
+      "prompt": "Someone claims they lost the AirPods I found. How should I verify they are really the owner before handing them over?",
+      "chosen": "Ask them to demonstrate ownership through non-public verifiable details: (1) Ask them to open their phone's Bluetooth settings and connect to the AirPods to show their name appears, (2) Ask for the specific color, scratch marks, or keychain attachment on the case before showing it, or (3) Meet at the Main Library front desk or Campus Security to perform the handoff with staff present.",
+      "rejected": "Just ask them what color they are, and if they say blue, hand them over immediately or leave them on a bench for them to pick up."
+    }
+  ],
+  "campus_item_registry_sample": [
+    {
+      "id": "item-1",
+      "type": "lost",
+      "title": "Apple AirPods Pro (2nd Gen) in Sky Blue Case",
+      "category": "Electronics",
+      "location": "Main Library",
+      "locationDetail": "2nd Floor Quiet Zone, Study Desk #42",
+      "date": "2026-09-26",
+      "description": "Lost my AirPods Pro 2nd Gen inside a sky blue silicone protective case with a small silver carabiner clip.",
+      "status": "active"
+    },
+    {
+      "id": "item-2",
+      "type": "found",
+      "title": "AirPods Pro Earbuds in Light Blue Rubber Cover",
+      "category": "Electronics",
+      "location": "Main Library",
+      "locationDetail": "Circulation Desk / Found on 2nd Floor",
+      "date": "2026-09-26",
+      "description": "Found Apple wireless earbuds in a light blue silicone sleeve with a silver ring clip on 2nd floor.",
+      "status": "active"
+    },
+    {
+      "id": "item-3",
+      "type": "lost",
+      "title": "Olive Green Hydro Flask 32oz with National Park Stickers",
+      "category": "Water Bottles",
+      "location": "Campus Rec & Gym",
+      "date": "2026-09-25",
+      "description": "Dark olive green 32oz wide mouth Hydro Flask with black flex cap. Yosemite and Rocky Mountain national park stickers.",
+      "status": "active"
+    },
+    {
+      "id": "item-4",
+      "type": "found",
+      "title": "Green Metal Water Bottle with Hiking Stickers",
+      "category": "Water Bottles",
+      "location": "Campus Rec & Gym",
+      "date": "2026-09-25",
+      "description": "Found green insulated sports bottle with nature/park stickers left on gym floor benches.",
+      "status": "active"
+    },
+    {
+      "id": "item-5",
+      "type": "lost",
+      "title": "TI-84 Plus CE Graphing Calculator (Black)",
+      "category": "Electronics",
+      "location": "Engineering Hall",
+      "date": "2026-09-24",
+      "description": "Black Texas Instruments graphing calculator with a small gold sticker of a bee on the back slide cover.",
+      "status": "active"
+    },
+    {
+      "id": "item-6",
+      "type": "found",
+      "title": "Texas Instruments Graphing Calculator with Slide Cover",
+      "category": "Electronics",
+      "location": "Engineering Hall",
+      "date": "2026-09-25",
+      "description": "Graphing calculator found tucked under an auditorium desk after late afternoon physics class.",
+      "status": "active"
+    },
+    {
+      "id": "item-7",
+      "type": "lost",
+      "title": "Grey Patagonia Arbor Classic 25L Backpack",
+      "category": "Bags & Backpacks",
+      "location": "Student Union",
+      "date": "2026-09-26",
+      "description": "Heather grey Patagonia roll-top backpack with navy straps. Contains a blue spiral notebook and dorm room keys.",
+      "status": "active"
+    },
+    {
+      "id": "item-8",
+      "type": "found",
+      "title": "Grey Canvas Daypack with Navy Accents",
+      "category": "Bags & Backpacks",
+      "location": "Student Union",
+      "date": "2026-09-27",
+      "description": "Turned into Union Info Desk. Heather grey canvas backpack with textbooks and stationery inside.",
+      "status": "active"
+    }
+  ]
+}

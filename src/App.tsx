@@ -7,6 +7,7 @@ import { ReportItemPage } from './pages/ReportItemPage';
 import { AIMatchingPage } from './pages/AIMatchingPage';
 import { ItemDetailsModal } from './components/ItemDetailsModal';
 import { SafeContactModal } from './components/SafeContactModal';
+import { N8nChatWidget } from './components/N8nChatWidget';
 import { Item, ItemCategory, ItemType } from './types';
 import { getStoredItems, addStoredItem, resetStoredItems } from './utils/storage';
 
@@ -159,6 +160,9 @@ export default function App() {
           onClose={() => setSelectedItemForContact(null)}
         />
       )}
+
+      {/* Floating n8n AI Agent Chat Widget */}
+      <N8nChatWidget />
     </div>
   );
 }

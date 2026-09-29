@@ -12,7 +12,13 @@ import {
   ChevronRight,
   Split,
   Eye,
-  MessageSquare
+  MessageSquare,
+  Download,
+  Copy,
+  Check,
+  Database,
+  FileCode,
+  CheckCircle2
 } from 'lucide-react';
 import { Item, MatchResult } from '../types';
 import { compareItems, findMatchesForItem, findGlobalCampusMatches } from '../utils/aiMatching';
@@ -33,9 +39,10 @@ export const AIMatchingPage: React.FC<AIMatchingPageProps> = ({
   onViewItemDetails,
   onOpenSafeContact,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'inspect' | 'global' | 'simulator'>(
+  const [activeSubTab, setActiveSubTab] = useState<'inspect' | 'global' | 'simulator' | 'dataset'>(
     selectedItemForMatch ? 'inspect' : 'global'
   );
+  const [copiedType, setCopiedType] = useState<string | null>(null);
 
   // For Simulator
   const [simTitle, setSimTitle] = useState('Apple AirPods with blue case');
@@ -81,6 +88,14 @@ export const AIMatchingPage: React.FC<AIMatchingPageProps> = ({
   // Modal for side-by-side comparison
   const [comparisonPair, setComparisonPair] = useState<MatchResult | null>(null);
 
+  const handleCopy = (text: string, type: string) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedType(type);
+      setTimeout(() => setCopiedType(null), 2000);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Page Header */}
@@ -100,7 +115,7 @@ export const AIMatchingPage: React.FC<AIMatchingPageProps> = ({
         </div>
 
         {/* Sub-tab navigation */}
-        <div className="inline-flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 self-start md:self-auto">
+        <div className="inline-flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 self-start md:self-auto flex-wrap">
           <button
             onClick={() => setActiveSubTab('global')}
             className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
@@ -130,6 +145,17 @@ export const AIMatchingPage: React.FC<AIMatchingPageProps> = ({
             }`}
           >
             Live Simulator
+          </button>
+          <button
+            onClick={() => setActiveSubTab('dataset')}
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+              activeSubTab === 'dataset'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-blue-700 hover:bg-blue-50'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>Agent Training Data</span>
           </button>
         </div>
       </div>
@@ -566,6 +592,165 @@ export const AIMatchingPage: React.FC<AIMatchingPageProps> = ({
                 Type more keywords above to simulate matching.
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* VIEW 4: AGENT TRAINING DATA & EXPORT */}
+      {activeSubTab === 'dataset' && (
+        <div className="space-y-6">
+          {/* Header Card */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Database className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-bold text-slate-900">
+                  AI Agent Fine-Tuning & Evaluation Dataset
+                </h2>
+              </div>
+              <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
+                Pre-formatted conversational transcripts, domain entity ontology, scoring weights,
+                and paired item matches curated from this application. Ready for fine-tuning OpenAI, Gemini, LLaMA, or Mistral models.
+              </p>
+            </div>
+
+            {/* Direct Download Buttons */}
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <a
+                href="/training_dataset.json"
+                download="lost_and_found_ai_training.json"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition-all shadow-xs flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download .JSON</span>
+              </a>
+              <a
+                href="/training_dataset.jsonl"
+                download="lost_and_found_ai_training.jsonl"
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition-all shadow-xs flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download .JSONL</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-white border border-slate-200 rounded-xl text-center">
+              <span className="text-xl font-black text-blue-600 block">ChatML & Alpaca</span>
+              <span className="text-[11px] text-slate-500 font-medium">Instruction Formats</span>
+            </div>
+            <div className="p-4 bg-white border border-slate-200 rounded-xl text-center">
+              <span className="text-xl font-black text-slate-900 block">{items.length}</span>
+              <span className="text-[11px] text-slate-500 font-medium">Curated Items Seeded</span>
+            </div>
+            <div className="p-4 bg-white border border-slate-200 rounded-xl text-center">
+              <span className="text-xl font-black text-emerald-600 block">{globalPairs.length}</span>
+              <span className="text-[11px] text-slate-500 font-medium">High Match Pairs</span>
+            </div>
+            <div className="p-4 bg-white border border-slate-200 rounded-xl text-center">
+              <span className="text-xl font-black text-indigo-600 block">4 Feature Weights</span>
+              <span className="text-[11px] text-slate-500 font-medium">Scoring Algorithm</span>
+            </div>
+          </div>
+
+          {/* JSON Preview Sections */}
+          <div className="space-y-4">
+            <div className="bg-slate-900 text-slate-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <FileCode className="w-4 h-4 text-blue-400" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">
+                    training_dataset.jsonl (OpenAI / ChatML Standard)
+                  </span>
+                </div>
+                <button
+                  onClick={() =>
+                    handleCopy(
+                      JSON.stringify(
+                        [
+                          {
+                            messages: [
+                              {
+                                role: 'system',
+                                content:
+                                  'You are Lost & Found AI, an intelligent campus belongings recovery agent.',
+                              },
+                              {
+                                role: 'user',
+                                content:
+                                  'I lost my AirPods Pro on the second floor of the campus library in a sky blue case.',
+                              },
+                              {
+                                role: 'assistant',
+                                content:
+                                  'I identified a high-confidence match (92%): AirPods Pro Earbuds in Light Blue Cover found in Main Library 2nd floor, turned into 1st Floor Security.',
+                              },
+                            ],
+                          },
+                        ],
+                        null,
+                        2
+                      ),
+                      'chatml'
+                    )
+                  }
+                  className="px-2.5 py-1 text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md transition-colors flex items-center gap-1.5"
+                >
+                  {copiedType === 'chatml' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy Snippet</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <pre className="text-xs font-mono text-slate-300 bg-slate-950 p-4 rounded-xl overflow-x-auto leading-relaxed max-h-72">
+{`{"messages": [{"role": "system", "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."}, {"role": "user", "content": "I lost my AirPods Pro on the second floor of the campus library in a sky blue silicone case."}, {"role": "assistant", "content": "I found a potential 92% match: 'AirPods Pro Earbuds in Light Blue Rubber Cover' turned in at Main Library Circulation Desk."}]}
+{"messages": [{"role": "system", "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."}, {"role": "user", "content": "Extract structured item parameters from: 'Left black TI-84 calculator with bee sticker in Engineering Hall 302.'"}, {"role": "assistant", "content": "{\\"type\\": \\"lost\\", \\"title\\": \\"TI-84 Graphing Calculator\\", \\"category\\": \\"Electronics\\", \\"location\\": \\"Engineering Hall\\", \\"location_detail\\": \\"Room 302\\"}"}]}
+{"messages": [{"role": "system", "content": "You are Lost & Found AI, an intelligent campus belongings recovery agent."}, {"role": "user", "content": "Someone found my backpack. How do I safely verify ownership without disclosing private passcodes?"}, {"role": "assistant", "content": "Meet at an official desk (Main Library or Student Union Welcome Counter) and describe physical non-public clues (specific keychain, notebook titles, scuffs)."}]}`}
+              </pre>
+            </div>
+
+            {/* Feature Weighting Matrix */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+              <h3 className="text-sm font-bold text-slate-900">
+                Ground-Truth Feature Scoring Matrix
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="text-[11px] font-bold text-blue-700 block">40% Keyword / NLP</span>
+                  <span className="text-slate-600 mt-1 block">
+                    Jaccard token coefficient + weighted key brand/descriptor matches.
+                  </span>
+                </div>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="text-[11px] font-bold text-blue-700 block">25% Category</span>
+                  <span className="text-slate-600 mt-1 block">
+                    Exact category match = 100%, related = 40%, unrelated = 10%.
+                  </span>
+                </div>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="text-[11px] font-bold text-blue-700 block">20% Campus Hub</span>
+                  <span className="text-slate-600 mt-1 block">
+                    Identical building = 100%, adjacent zone = 65%, other = 20%.
+                  </span>
+                </div>
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <span className="text-[11px] font-bold text-blue-700 block">15% Timeline</span>
+                  <span className="text-slate-600 mt-1 block">
+                    0-day = 100%, 1-day = 90%, 2-3 days = 75%, 4-7 days = 55%.
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

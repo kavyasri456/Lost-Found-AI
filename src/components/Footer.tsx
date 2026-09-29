@@ -69,6 +69,16 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onResetData }) => {
                   File Lost or Found Report
                 </button>
               </li>
+              <li>
+                <a
+                  href="/training_dataset.json"
+                  download="lost_and_found_training.json"
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors inline-flex items-center gap-1"
+                >
+                  <span>Download Agent Dataset</span>
+                  <span className="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">JSON</span>
+                </a>
+              </li>
             </ul>
           </div>
 
